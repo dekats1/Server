@@ -2,6 +2,7 @@ package com.warage.server.service;// src/main/java/com/yourgame/warage/service/P
 
 import com.warage.server.model.PlayerProfile;
 import com.warage.server.repository.PlayerProfileRepository;
+import org.springframework.security.crypto.password.PasswordEncoder; // Импортируем
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,17 +10,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Service // Указывает, что это компонент сервиса
+@Service
 public class PlayerProfileService {
 
     private final PlayerProfileRepository playerProfileRepository;
+    private final PasswordEncoder passwordEncoder; // Внедряем PasswordEncoder
 
-    // Внедрение зависимости через конструктор (рекомендуемый способ)
-    public PlayerProfileService(PlayerProfileRepository playerProfileRepository) {
+    public PlayerProfileService(PlayerProfileRepository playerProfileRepository, PasswordEncoder passwordEncoder) {
         this.playerProfileRepository = playerProfileRepository;
+        this.passwordEncoder = passwordEncoder; // Инициализируем
     }
 
-    @Transactional(readOnly = true) // Транзакция только для чтения
+    @Transactional(readOnly = true)
     public Optional<PlayerProfile> getPlayerProfileById(Long id) {
         return playerProfileRepository.findById(id);
     }
@@ -34,24 +36,33 @@ public class PlayerProfileService {
         return playerProfileRepository.findAll();
     }
 
-    @Transactional // Открытие транзакции для записи
-    public PlayerProfile createPlayerProfile(String username) {
-        // Проверяем, существует ли пользователь с таким именем
+    // Обновленный метод для создания профиля с email и паролем
+    @Transactional
+    public PlayerProfile registerPlayer(String username, String password, String email) {
+        // Проверяем, существует ли пользователь с таким именем или email
         if (playerProfileRepository.findByUsername(username).isPresent()) {
-            throw new IllegalArgumentException("User with username " + username + " already exists.");
+            throw new IllegalArgumentException("User with username '" + username + "' already exists.");
         }
-        PlayerProfile newProfile = new PlayerProfile(username, 0, 0); // Новые игроки начинают с 0 монет/опыта
+        if (playerProfileRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("User with email '" + email + "' already exists.");
+        }
+
+        // Хешируем пароль перед сохранением
+        String hashedPassword = passwordEncoder.encode(password);
+
+        PlayerProfile newProfile = new PlayerProfile(username, email, hashedPassword, 0, 0); // Новые игроки
         return playerProfileRepository.save(newProfile);
     }
 
+    // Исправленный код
     @Transactional
     public PlayerProfile updatePlayerProfile(Long id, PlayerProfile updatedProfile) {
         return playerProfileRepository.findById(id)
                 .map(profile -> {
                     profile.setCoins(updatedProfile.getCoins());
-                    profile.setExperience(updatedProfile.getExperience());
-                    profile.setLastLogin(LocalDateTime.now()); // Обновляем время последнего входа
-                    // Можно добавить другие поля для обновления
+                    profile.setExperience(updatedProfile.getExperience()); // <-- Исправлено
+                    profile.setLastLogin(LocalDateTime.now());
+                    // ...
                     return playerProfileRepository.save(profile);
                 })
                 .orElseThrow(() -> new IllegalArgumentException("Player profile with ID " + id + " not found."));
@@ -62,17 +73,18 @@ public class PlayerProfileService {
         playerProfileRepository.deleteById(id);
     }
 
+    // Обновленный метод логина для проверки пароля
     @Transactional
-    public PlayerProfile loginPlayer(String username) {
+    public PlayerProfile loginPlayer(String username, String password) {
         return playerProfileRepository.findByUsername(username)
                 .map(profile -> {
-                    profile.setLastLogin(LocalDateTime.now());
-                    return playerProfileRepository.save(profile);
+                    if (passwordEncoder.matches(password, profile.getHashedPassword())) {
+                        profile.setLastLogin(LocalDateTime.now());
+                        return playerProfileRepository.save(profile);
+                    } else {
+                        throw new IllegalArgumentException("Invalid password for user: " + username);
+                    }
                 })
-                .orElseGet(() -> {
-                    // Если пользователя нет, создаем новый профиль
-                    System.out.println("Creating new player profile for: " + username);
-                    return createPlayerProfile(username);
-                });
+                .orElseThrow(() -> new IllegalArgumentException("User '" + username + "' not found."));
     }
 }

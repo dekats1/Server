@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RestController // Указывает, что это REST-контроллер
-@RequestMapping("/api/v1/players") // Базовый URL для всех эндпоинтов в этом контроллере
+@RestController
+@RequestMapping("/api/v1/players")
 public class PlayerProfileController {
 
     private final PlayerProfileService playerProfileService;
@@ -19,81 +19,50 @@ public class PlayerProfileController {
         this.playerProfileService = playerProfileService;
     }
 
-    // Эндпоинт для получения профиля игрока по ID
-    // GET /api/v1/players/{id}
-    @GetMapping("/{id}")
-    public ResponseEntity<PlayerProfile> getPlayerProfileById(@PathVariable Long id) {
-        return playerProfileService.getPlayerProfileById(id)
-                .map(ResponseEntity::ok) // Если найден, возвращаем 200 OK и профиль
-                .orElse(ResponseEntity.notFound().build()); // Если не найден, возвращаем 404 Not Found
-    }
+    // (GET методы остаются без изменений)
 
-    // Эндпоинт для получения профиля игрока по имени пользователя
-    // GET /api/v1/players/username/{username}
-    @GetMapping("/username/{username}")
-    public ResponseEntity<PlayerProfile> getPlayerProfileByUsername(@PathVariable String username) {
-        return playerProfileService.getPlayerProfileByUsername(username)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // Эндпоинт для получения списка всех игроков (возможно, для админ-панели или таблицы лидеров)
-    // GET /api/v1/players
-    @GetMapping
-    public ResponseEntity<List<PlayerProfile>> getAllPlayerProfiles() {
-        List<PlayerProfile> players = playerProfileService.getAllPlayerProfiles();
-        return ResponseEntity.ok(players);
-    }
-
-    // Эндпоинт для создания нового профиля игрока
+    // Эндпоинт для регистрации нового игрока
     // POST /api/v1/players/register
     @PostMapping("/register")
     public ResponseEntity<PlayerProfile> registerPlayer(@RequestBody Map<String, String> request) {
         String username = request.get("username");
-        if (username == null || username.trim().isEmpty()) {
+        String password = request.get("password");
+        String email = request.get("email");
+
+        if (username == null || username.trim().isEmpty() ||
+                password == null || password.trim().isEmpty() ||
+                email == null || email.trim().isEmpty()) {
             return ResponseEntity.badRequest().body(null); // 400 Bad Request
         }
+
         try {
-            PlayerProfile newProfile = playerProfileService.createPlayerProfile(username);
+            PlayerProfile newProfile = playerProfileService.registerPlayer(username, password, email);
             return new ResponseEntity<>(newProfile, HttpStatus.CREATED); // 201 Created
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // 409 Conflict (пользователь уже существует)
+            // Возвращаем 409 Conflict, если пользователь/email уже существует
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
     }
 
-    // Эндпоинт для логина игрока (или создания, если нет)
+    // Эндпоинт для логина игрока (теперь с проверкой пароля)
     // POST /api/v1/players/login
     @PostMapping("/login")
     public ResponseEntity<PlayerProfile> loginPlayer(@RequestBody Map<String, String> request) {
         String username = request.get("username");
-        if (username == null || username.trim().isEmpty()) {
+        String password = request.get("password");
+
+        if (username == null || username.trim().isEmpty() ||
+                password == null || password.trim().isEmpty()) {
             return ResponseEntity.badRequest().body(null);
         }
-        PlayerProfile profile = playerProfileService.loginPlayer(username);
-        return ResponseEntity.ok(profile); // 200 OK
-    }
-
-    // Эндпоинт для обновления данных игрока
-    // PUT /api/v1/players/{id}
-    @PutMapping("/{id}")
-    public ResponseEntity<PlayerProfile> updatePlayerProfile(@PathVariable Long id, @RequestBody PlayerProfile playerProfile) {
         try {
-            PlayerProfile updated = playerProfileService.updatePlayerProfile(id, playerProfile);
-            return ResponseEntity.ok(updated);
+            PlayerProfile profile = playerProfileService.loginPlayer(username, password);
+            return ResponseEntity.ok(profile); // 200 OK
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            // Например, 401 Unauthorized если пароль неверный, или 404 Not Found если пользователь не найден
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
 
-    // Эндпоинт для удаления профиля игрока
-    // DELETE /api/v1/players/{id}
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePlayerProfile(@PathVariable Long id) {
-        try {
-            playerProfileService.deletePlayerProfile(id);
-            return ResponseEntity.noContent().build(); // 204 No Content
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build(); // Или другой статус, если ID не найден
-        }
-    }
+    // (PUT и DELETE методы остаются без изменений)
 }

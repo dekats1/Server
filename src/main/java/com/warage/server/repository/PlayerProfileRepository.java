@@ -1,5 +1,4 @@
-package com.warage.server.repository;
-
+package com.warage.server.repository;// src/main/java/com/yourgame/warage/repository/PlayerProfileRepository.java
 
 import com.warage.server.model.PlayerProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +10,5 @@ import java.util.Optional;
 public interface PlayerProfileRepository extends JpaRepository<PlayerProfile, Long> {
 
     Optional<PlayerProfile> findByUsername(String username);
+    Optional<PlayerProfile> findByEmail(String email); // Добавили метод для поиска по email
 }
