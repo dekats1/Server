@@ -19,10 +19,7 @@ public class PlayerProfileController {
         this.playerProfileService = playerProfileService;
     }
 
-    // (GET методы остаются без изменений)
 
-    // Эндпоинт для регистрации нового игрока
-    // POST /api/v1/players/register
     @PostMapping("/register")
     public ResponseEntity<PlayerProfile> registerPlayer(@RequestBody Map<String, String> request) {
         String username = request.get("username");
@@ -44,8 +41,6 @@ public class PlayerProfileController {
         }
     }
 
-    // Эндпоинт для логина игрока (теперь с проверкой пароля)
-    // POST /api/v1/players/login
     @PostMapping("/login")
     public ResponseEntity<PlayerProfile> loginPlayer(@RequestBody Map<String, String> request) {
         String username = request.get("username");
@@ -64,5 +59,4 @@ public class PlayerProfileController {
         }
     }
 
-    // (PUT и DELETE методы остаются без изменений)
 }

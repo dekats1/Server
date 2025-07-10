@@ -24,7 +24,7 @@ public class PlayerProgress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long progressID;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "playerID", nullable = false)

@@ -23,7 +23,7 @@ public class PlayerProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long playerID;
 
     @Column(unique = true, nullable = false)
     private String username;

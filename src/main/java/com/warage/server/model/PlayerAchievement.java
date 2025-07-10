@@ -36,4 +36,10 @@ public class PlayerAchievement {
 
     @Column(nullable = false)
     private LocalDateTime dateAchieved;
+
+    @Column(name = "progress")
+    private Integer progress;
+
+    @Column(name = "needToReward")
+    private Integer needToReward;
 }

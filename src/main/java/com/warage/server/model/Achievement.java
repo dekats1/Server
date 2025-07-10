@@ -27,10 +27,6 @@ public class Achievement {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private Integer progress;
-
-    private Integer needToReward;
-
     @Column(nullable = false)
     private Integer rewardMoney;
 
