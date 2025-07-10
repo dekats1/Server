@@ -1,0 +1,133 @@
+-- Установка кодировки для корректной работы с UTF-8 (для русского языка и символов)
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
+-- Выберите вашу базу данных
+-- ЗАМЕНИТЕ 'your_database_name' НА ИМЯ ВАШЕЙ БД
+USE your_database_name;
+
+-- -----------------------------------------------------
+-- Table `player_profiles`
+-- Хранит информацию об игроках, включая глобальный прогресс в бесконечном режиме
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `player_profiles` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `username` VARCHAR(255) NOT NULL UNIQUE,
+    `email` VARCHAR(255) NOT NULL UNIQUE,
+    `hashed_password` VARCHAR(255) NOT NULL,
+    `coins` INT DEFAULT 0,
+    `experience` INT DEFAULT 0,
+    `last_login` DATETIME,
+    `endless_highest_wave` INT DEFAULT 0,
+    `endless_high_score` BIGINT DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------
+-- Table `towers`
+-- Хранит базовую информацию о каждом типе башни
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `towers` (
+    `tower_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL UNIQUE,
+    `description` TEXT,
+    `base_cost` INT NOT NULL,
+    `asset_path` VARCHAR(255)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------
+-- Table `tower_upgrades`
+-- Хранит детальную информацию о каждом уровне прокачки для каждого пути башни
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tower_upgrades` (
+    `upgrade_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `tower_id` INT NOT NULL,
+    `upgrade_path` INT NOT NULL,     -- 1, 2 или 3
+    `upgrade_level` INT NOT NULL,    -- 1-5
+    `cost` INT NOT NULL,
+    `damage` INT NOT NULL,
+    `range` DOUBLE NOT NULL,
+    `attack_speed` DOUBLE NOT NULL,
+    `special_effect_description` TEXT,
+    `can_detect_invisible` BOOLEAN DEFAULT FALSE, -- Способность видеть невидимых врагов
+    FOREIGN KEY (`tower_id`) REFERENCES `towers`(`tower_id`)
+        ON DELETE CASCADE ON UPDATE CASCADE, -- Удаление башни удаляет её улучшения, обновление ID башни обновляет в этой таблице
+    UNIQUE (`tower_id`, `upgrade_path`, `upgrade_level`) -- Гарантирует уникальность каждой ступени улучшения
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------
+-- Table `enemies`
+-- Хранит информацию о различных типах врагов
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `enemies` (
+    `enemy_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL UNIQUE,
+    `description` TEXT,
+    `base_health` INT NOT NULL,
+    `speed` DOUBLE NOT NULL,
+    `reward_coins` INT NOT NULL,
+    `reward_experience` INT NOT NULL,
+    `asset_path` VARCHAR(255),
+    `is_invisible` BOOLEAN DEFAULT FALSE -- Признак невидимости
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------
+-- Table `levels`
+-- Хранит информацию об игровых уровнях/картах кампании
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `levels` (
+    `level_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL UNIQUE,
+    `description` TEXT,
+    `starting_coins` INT NOT NULL,
+    `map_data_path` VARCHAR(255),       -- Путь к файлу с данными карты
+    `wave_config_path` VARCHAR(255)     -- Путь к файлу с конфигурацией волн
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------
+-- Table `player_progress`
+-- Хранит прогресс каждого игрока по уровням кампании
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `player_progress` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `player_id` BIGINT NOT NULL,
+    `level_id` INT NOT NULL,
+    `highest_wave_reached` INT DEFAULT 0, -- Если уровень имеет лимит волн
+    `score` INT DEFAULT 0,
+    `completed` BOOLEAN DEFAULT FALSE,
+    `unlocked_next_level` BOOLEAN DEFAULT FALSE,
+    `last_played` DATETIME,
+    FOREIGN KEY (`player_id`) REFERENCES `player_profiles`(`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`level_id`) REFERENCES `levels`(`level_id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE (`player_id`, `level_id`) -- Игрок может иметь только одну запись прогресса на уровень
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------
+-- Table `achievements`
+-- Хранит список всех возможных достижений в игре
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `achievements` (
+    `achievement_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL UNIQUE,
+    `description` TEXT,
+    `criteria` TEXT,
+    `reward_coins` INT DEFAULT 0,
+    `reward_experience` INT DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------
+-- Table `player_achievements`
+-- Связующая таблица для отслеживания достижений, полученных игроками
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `player_achievements` (
+    `player_achievement_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `player_id` BIGINT NOT NULL,
+    `achievement_id` INT NOT NULL,
+    `date_achieved` DATETIME NOT NULL,
+    FOREIGN KEY (`player_id`) REFERENCES `player_profiles`(`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`achievement_id`) REFERENCES `achievements`(`achievement_id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE (`player_id`, `achievement_id`) -- Игрок может получить достижение только один раз
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
