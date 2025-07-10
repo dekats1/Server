@@ -50,7 +50,17 @@ public class PlayerProfileService {
         // Хешируем пароль перед сохранением
         String hashedPassword = passwordEncoder.encode(password);
 
-        PlayerProfile newProfile = new PlayerProfile(username, email, hashedPassword, 0, 0); // Новые игроки
+        PlayerProfile newProfile = PlayerProfile.builder()
+                .username(username)
+                .email(email)
+                .hashedPassword(hashedPassword)
+                .money(0)
+                .experience(0)
+                .lastLogin(LocalDateTime.now())
+                .maxDamage(0)
+                .endlessHighestWave(0)
+                .endlessHighScore(0L)
+                .build();
         return playerProfileRepository.save(newProfile);
     }
 
@@ -59,7 +69,7 @@ public class PlayerProfileService {
     public PlayerProfile updatePlayerProfile(Long id, PlayerProfile updatedProfile) {
         return playerProfileRepository.findById(id)
                 .map(profile -> {
-                    profile.setCoins(updatedProfile.getCoins());
+                    profile.setMoney(updatedProfile.getMoney());
                     profile.setExperience(updatedProfile.getExperience()); // <-- Исправлено
                     profile.setLastLogin(LocalDateTime.now());
                     // ...

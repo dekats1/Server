@@ -1,5 +1,4 @@
-package com.warage.server.model;// src/main/java/com/yourgame/warage/model/PlayerProfile.java
-
+package com.warage.server.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,10 +6,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "player_profiles")
 public class PlayerProfile {
 
@@ -18,99 +25,31 @@ public class PlayerProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false) // Убедитесь, что username уникален и не null
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(unique = true) // Email тоже должен быть уникальным
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false) // Пароль не должен быть null
-    private String hashedPassword; // Храним хешированный пароль
+    @Column(nullable = false)
+    private String hashedPassword;
 
-    private int coins;
+    @Column(nullable = false)
+    private int money;
+
+    @Column(nullable = false)
     private int experience;
+
+    @Column(name = "lastLogin" )
     private LocalDateTime lastLogin;
 
-    public PlayerProfile() {
-    }
+    @Column(name = "maxDamage")
+    private int maxDamage;
 
-    // Обновленный конструктор
-    public PlayerProfile(String username, String email, String hashedPassword, int coins, int experience) {
-        this.username = username;
-        this.email = email;
-        this.hashedPassword = hashedPassword;
-        this.coins = coins;
-        this.experience = experience;
-        this.lastLogin = LocalDateTime.now();
-    }
+    @Column(name = "endlessHighestWave")
+    private int endlessHighestWave;
 
-    // --- Геттеры и Сеттеры ---
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "endlessHighScore")
+    private Long endlessHighScore;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
-
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
-
-    public int getCoins() {
-        return coins;
-    }
-
-    public void setCoins(int coins) {
-        this.coins = coins;
-    }
-
-    public int getExperience() {
-        return experience;
-    }
-
-    public void setExperience(int experience) {
-        this.experience = experience;
-    }
-
-    public LocalDateTime getLastLogin() {
-        return lastLogin;
-    }
-
-    public void setLastLogin(LocalDateTime lastLogin) {
-        this.lastLogin = lastLogin;
-    }
-
-    @Override
-    public String toString() {
-        return "PlayerProfile{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", hashedPassword='[PROTECTED]'" + // Не выводите хешированный пароль в логах!
-                ", coins=" + coins +
-                ", experience=" + experience +
-                ", lastLogin=" + lastLogin +
-                '}';
-    }
 }
