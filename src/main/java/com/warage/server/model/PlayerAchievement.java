@@ -24,22 +24,23 @@ public class PlayerAchievement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="player_achievement_id")
     private Long playerAchievementID;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "playerID", nullable = false)
+    @JoinColumn(name = "player_id", nullable = false)
     private PlayerProfile player;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "achievementID", nullable = false)
+    @JoinColumn(name = "achievement_id", nullable = false)
     private Achievement achievement;
 
-    @Column(nullable = false)
+    @Column(nullable = false,name = "date_achieved")
     private LocalDateTime dateAchieved;
 
     @Column(name = "progress")
     private Integer progress;
 
-    @Column(name = "needToReward")
+    @Column(name = "need_to_reward")
     private Integer needToReward;
 }

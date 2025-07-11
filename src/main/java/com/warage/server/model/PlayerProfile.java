@@ -40,15 +40,15 @@ public class PlayerProfile {
     @Column(nullable = false)
     private int experience;
 
-    @Column(name = "lastLogin" )
+    @Column(name = "last_login" )
     private LocalDateTime lastLogin;
 
-    @Column(name = "maxDamage")
+    @Column(name = "max_damage")
     private int maxDamage;
 
-    @Column(name = "endlessHighestWave")
+    @Column(name = "endless_highest_wave")
     private int endlessHighestWave;
 
-    @Column(name = "endlessHighScore")
+    @Column(name = "endless_high_score")
     private Long endlessHighScore;
 }

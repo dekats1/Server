@@ -19,6 +19,7 @@ public class Level {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "level_id")
     private Integer levelID;
 
     @Column(unique = true, nullable = false)
@@ -27,12 +28,13 @@ public class Level {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false,name = "starting_coins")
     private Integer startingCoins;
 
+    @Column(name = "reward_money")
     private Integer rewardMoney;
-
+    @Column(name = "map_data_path")
     private String mapDataPath;
-
+    @Column(name = "wave_config_path")
     private String waveConfigPath;
 }

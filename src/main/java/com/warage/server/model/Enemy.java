@@ -27,20 +27,20 @@ public class Enemy {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false,name = "base_health")
     private Integer baseHealth;
 
     @Column(nullable = false)
     private Double speed;
 
-    @Column(nullable = false)
+    @Column(nullable = false,name = "reward_coins")
     private Integer rewardCoins;
 
-    @Column(nullable = false)
+    @Column(nullable = false,name = "reward_experience")
     private Integer rewardExperience;
 
     private String assetPath;
 
-    @Column(columnDefinition = "tinyint(1) default 0")
+    @Column(columnDefinition = "tinyint(1) default 0",name = "is_invisible")
     private Boolean isInvisible;
 }
