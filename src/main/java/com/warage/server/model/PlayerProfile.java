@@ -51,5 +51,4 @@ public class PlayerProfile {
 
     @Column(name = "endlessHighScore")
     private Long endlessHighScore;
-
 }
