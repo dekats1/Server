@@ -1,6 +1,10 @@
 package com.warage.server.controller;
 
+import com.warage.server.model.Achievement;
+import com.warage.server.model.PlayerAchievement;
 import com.warage.server.model.PlayerProfile;
+import com.warage.server.repository.AchievementsRepository;
+import com.warage.server.repository.PlayerAchievementRepository;
 import com.warage.server.service.PlayerProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +19,7 @@ public class PlayerProfileController {
 
     private final PlayerProfileService playerProfileService;
 
-    public PlayerProfileController(PlayerProfileService playerProfileService) {
+    public PlayerProfileController(PlayerProfileService playerProfileService, AchievementsRepository achievementsRepository, PlayerAchievementRepository playerAchievementRepository) {
         this.playerProfileService = playerProfileService;
     }
 

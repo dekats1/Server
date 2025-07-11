@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         // Разрешаем доступ к нашим эндпоинтам регистрации и логина без аутентификации
                         .requestMatchers("/api/v1/players/register", "/api/v1/players/login").permitAll()
+                        .requestMatchers("/api/player-achievements/**").permitAll()
                         // Разрешаем доступ к консоли H2 (если вы ее используете)
                         .requestMatchers("/h2-console/**").permitAll()
                         // Все остальные запросы должны быть аутентифицированы

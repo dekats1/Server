@@ -19,6 +19,7 @@ public class Achievement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column (name = "achievement_id")
     private Integer achievementID;
 
     @Column(unique = true, nullable = false)
@@ -32,4 +33,7 @@ public class Achievement {
 
     @Column(nullable = false)
     private Integer rewardExperience;
+
+    @Column(name = "need_to_reward")
+    private Integer needToReward;
 }

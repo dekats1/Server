@@ -46,10 +46,7 @@ public class PlayerAchievementService {
         PlayerAchievement pa = playerAchievementRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Achievement not found"));
 
-        if (pa.getProgress() >= pa.getNeedToReward()) {
 
-            return true;
-        }
         return false;
     }
 }

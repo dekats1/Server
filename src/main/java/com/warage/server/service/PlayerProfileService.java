@@ -1,6 +1,10 @@
 package com.warage.server.service;// src/main/java/com/yourgame/warage/service/PlayerProfileService.java
 
+import com.warage.server.model.Achievement;
+import com.warage.server.model.PlayerAchievement;
 import com.warage.server.model.PlayerProfile;
+import com.warage.server.repository.AchievementsRepository;
+import com.warage.server.repository.PlayerAchievementRepository;
 import com.warage.server.repository.PlayerProfileRepository;
 import org.springframework.security.crypto.password.PasswordEncoder; // Импортируем
 import org.springframework.stereotype.Service;
@@ -15,10 +19,14 @@ public class PlayerProfileService {
 
     private final PlayerProfileRepository playerProfileRepository;
     private final PasswordEncoder passwordEncoder; // Внедряем PasswordEncoder
+    private final PlayerAchievementRepository playerAchievementRepository;
+    private final AchievementsRepository achievementsRepository;
 
-    public PlayerProfileService(PlayerProfileRepository playerProfileRepository, PasswordEncoder passwordEncoder) {
+    public PlayerProfileService(PlayerProfileRepository playerProfileRepository, PasswordEncoder passwordEncoder,PlayerAchievementRepository playerAchievementRepository, AchievementsRepository achievementRepository) {
         this.playerProfileRepository = playerProfileRepository;
         this.passwordEncoder = passwordEncoder; // Инициализируем
+        this.playerAchievementRepository = playerAchievementRepository;
+        this.achievementsRepository = achievementRepository;
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +69,9 @@ public class PlayerProfileService {
                 .endlessHighestWave(0)
                 .endlessHighScore(0L)
                 .build();
-        return playerProfileRepository.save(newProfile);
+        PlayerProfile savedProfile = playerProfileRepository.save(newProfile);
+        initializeAchievements(savedProfile);
+        return savedProfile;
     }
 
     // Исправленный код
@@ -96,5 +106,21 @@ public class PlayerProfileService {
                     }
                 })
                 .orElseThrow(() -> new IllegalArgumentException("User '" + username + "' not found."));
+    }
+
+    private void initializeAchievements(PlayerProfile profile) {
+        List<Achievement> allAchievements = achievementsRepository.findAll();
+
+        List<PlayerAchievement> playerAchievements = allAchievements.stream()
+                .map(achievement ->{
+                    PlayerAchievement playerAchievement = new PlayerAchievement();
+                    playerAchievement.setPlayer(profile);
+                    playerAchievement.setAchievement(achievement);
+                    playerAchievement.setDateAchieved(null);
+                    playerAchievement.setProgress(0);
+                    return playerAchievement;
+                }).toList();
+
+        playerAchievementRepository.saveAll(playerAchievements);
     }
 }

@@ -1,5 +1,6 @@
 package com.warage.server.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,18 +30,17 @@ public class PlayerAchievement {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id", nullable = false)
+    @JsonBackReference
     private PlayerProfile player;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "achievement_id", nullable = false)
+    @JsonBackReference
     private Achievement achievement;
 
-    @Column(nullable = false,name = "date_achieved")
+    @Column(name = "date_achieved")
     private LocalDateTime dateAchieved;
 
     @Column(name = "progress")
     private Integer progress;
-
-    @Column(name = "need_to_reward")
-    private Integer needToReward;
 }
