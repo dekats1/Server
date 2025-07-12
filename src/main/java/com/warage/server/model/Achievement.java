@@ -38,4 +38,7 @@ public class Achievement {
 
     @Column(name = "need_to_reward")
     private Integer needToReward;
+
+    @Column(name = "photo_path")
+    private String photoPath;
 }
