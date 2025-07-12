@@ -30,12 +30,10 @@ public class PlayerAchievement {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id", nullable = false)
-    @JsonBackReference
     private PlayerProfile player;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "achievement_id", nullable = false)
-    @JsonBackReference
     private Achievement achievement;
 
     @Column(name = "date_achieved")
