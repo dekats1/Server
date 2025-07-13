@@ -19,13 +19,14 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "player_profiles")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Table(name = "player_profiles")
+
 public class PlayerProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name = "player_id")
+    @Column(name = "player_id")
     private Long playerID;
 
     @Column(unique = true, nullable = false)

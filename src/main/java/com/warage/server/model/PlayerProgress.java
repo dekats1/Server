@@ -27,11 +27,11 @@ public class PlayerProgress {
     private Long progressID;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "playerID", nullable = false)
+    @JoinColumn(name = "player_id", nullable = false)
     private PlayerProfile player;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "levelID", nullable = false)
+    @JoinColumn(name = "level_id", nullable = false)
     private Level level;
 
     @Column(nullable = false)

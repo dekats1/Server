@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 @Table(name = "player_achievements")
 public class PlayerAchievement {
 
