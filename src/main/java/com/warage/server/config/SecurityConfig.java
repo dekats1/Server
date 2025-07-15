@@ -57,6 +57,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/player-achievements/**").permitAll()
                         .requestMatchers("/api/version/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/api/towers/**").permitAll()
+                        .requestMatchers("/api/enemies/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Используем STATELESS сессии

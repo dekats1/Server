@@ -19,6 +19,7 @@ public class Tower {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "tower_id")
     private Integer towerID;
 
     @Column(unique = true, nullable = false)

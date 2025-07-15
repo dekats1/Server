@@ -19,6 +19,7 @@ public class Enemy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "enemy_id")
     private Integer enemyID;
 
     @Column(unique = true, nullable = false)
