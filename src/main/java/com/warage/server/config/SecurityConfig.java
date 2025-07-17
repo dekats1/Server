@@ -59,6 +59,8 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/towers/**").permitAll()
                         .requestMatchers("/api/enemies/**").permitAll()
+                        .requestMatchers("/api/levels/**").permitAll()
+                        .requestMatchers("/api/tower-upgrades/**").permitAll()
 
                         .anyRequest().authenticated()
                 )
